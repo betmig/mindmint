@@ -1,0 +1,56 @@
+{
+  "name": "mindmint",
+  "version": "1.0.0",
+  "description": "MindMint: Theravada Forest Tradition meditation tools for fresh, present-moment awareness. Simple, open, and free - cultivate mindfulness naturally.",
+  "main": "/src/main/main.js",
+  "scripts": {
+    "start": "electron ./src/main/main.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/betmig/mindmint.git"
+  },
+  "keywords": [
+    "meditation",
+    "mindfulness",
+    "breathing",
+    "relaxation",
+    "mental",
+    "wellness",
+    "forest",
+    "meditation",
+    "theravada-inspired",
+    "simple",
+    "practice",
+    "daily",
+    "meditation",
+    "stress",
+    "relief",
+    "focus",
+    "calm",
+    "peace",
+    "quiet",
+    "mind",
+    "mental",
+    "clarity",
+    "beginner-friendly",
+    "secular",
+    "meditation",
+    "inclusive",
+    "wellness",
+    "free",
+    "meditation",
+    "universal",
+    "practice"
+  ],
+  "author": "Betmig Link (https://betmig.link & https://mettabit.io)",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/betmig/mindmint/issues"
+  },
+  "homepage": "https://github.com/betmig/mindmint#readme",
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}
