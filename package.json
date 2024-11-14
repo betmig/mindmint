@@ -1,15 +1,15 @@
 {
     "name": "mindmint",
     "version": "1.0.0",
+    "type": "module",
     "description": "MindMint: Theravada Forest Tradition meditation tools for fresh, present-moment awareness. Simple, open, and free - cultivate mindfulness naturally.",
     "main": "src/main/main.js",
     "scripts": {
         "dev": "vite",
         "build": "vite build",
         "start": "electron .",
-        "start:dev": "cross-env NODE_ENV=development OPEN_DEV_TOOLS=true concurrently \"vite\" \"electron .\"",
-        "start:dev:nodevtools": "cross-env NODE_ENV=development concurrently \"vite\" \"electron .\"",
-        "test": "jest"
+        "start:dev": "cross-env NODE_ENV=development OPEN_DEV_TOOLS=true concurrently \"vite\" \"electron main.mjs\"",
+        "start:dev:nodevtools": "cross-env NODE_ENV=development concurrently \"vite\" \"electron main.mjs\""
     },
     "repository": {
         "type": "git",
