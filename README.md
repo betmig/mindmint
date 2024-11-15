@@ -1,6 +1,6 @@
 # Mind Mint 🌿
 
-A modern meditation app that combines traditional Buddhist suttas with accessibility-focused features. Mind Mint helps practitioners deepen their practice through study and contemplation.
+A modern meditation app combining traditional Buddhist suttas with accessibility-focused features. Mind Mint helps practitioners deepen their practice through study and contemplation. Built and maintained by [MettaBit](https://mettabit.io).
 
 ## Features
 
@@ -41,111 +41,97 @@ A modern meditation app that combines traditional Buddhist suttas with accessibi
   - Amazon Polly
   - WellSaid Labs
 
-## Technology Stack
+## Quick Start
 
-- React 18
-- TypeScript
-- Tailwind CSS
-- Zustand (State Management)
-- Vite (Build Tool)
-- Lucide React Icons
-- Speech Synthesis API
-- Eleven Labs API Integration
-
-## Getting Started
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/betmig/mind-mint.git
-```
+# Clone the repository
+git clone https://github.com/yourusername/mind-mint.git
 
-2. Install dependencies:
-```bash
+# Install dependencies
 cd mind-mint
 npm install
-```
 
-3. Start the development server:
-```bash
+# Start development server
 npm run dev
-```
 
-4. Build for production:
-```bash
+# Build for production
 npm run build
 ```
 
+## Technology Stack
+
+- React 18 with TypeScript
+- Tailwind CSS for styling
+- Zustand for state management
+- Vite as build tool
+- Speech Synthesis API
+- Eleven Labs API integration
+- Lucide React for icons
+
 ## Configuration
 
-### Text-to-Speech Providers
-
-The app supports multiple TTS providers. To use them:
+### Text-to-Speech
 
 1. Navigate to Settings
 2. Select your preferred TTS provider
-3. Enter the required API credentials
-4. Select your preferred voice
-5. Test the voice with the preview feature (Eleven Labs)
+3. Enter API credentials if using premium providers
+4. Choose your preferred voice
+5. Test with preview feature
 
 ### Display Settings
 
-Customize the display:
-
-1. Choose between light/dark theme
-2. Adjust brightness, contrast, sepia, and grayscale
-3. Customize text highlight color and opacity
-4. Changes are applied in real-time
+- Choose between light/dark theme
+- Adjust brightness, contrast, sepia, and grayscale
+- Customize text highlight color and opacity
+- Changes apply in real-time
 
 ### Meditation Settings
 
-Configure your meditation experience:
-
-1. Set custom meditation duration
-2. Choose preferred bell sounds
-3. Configure bell timing (start/end)
-4. Enable/disable auto-start after sutta reading
-
-## Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch
-```bash
-git checkout -b feature/amazing-feature
-```
-3. Commit your changes
-```bash
-git commit -m 'Add amazing feature'
-```
-4. Push to the branch
-```bash
-git push origin feature/amazing-feature
-```
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
+- Set custom meditation duration
+- Choose preferred bell sounds
+- Configure bell timing (start/end)
+- Enable/disable auto-start after sutta reading
 
 ## Privacy
 
 Mind Mint respects your privacy:
-- All data is stored locally in browser storage
+- All data stored locally in browser storage
 - No analytics or tracking
 - No personal information collected
 - TTS API keys stored securely in local storage
 - No server-side data collection
 
-## Features in Development
+## Support
 
-- Sutta categorization and search
-- Custom meditation sequences
-- Guided meditation scripts
-- Progress tracking
-- Community sharing features
-- Additional TTS voices and languages
-- Mobile app version
+This project is funded and maintained by [MettaBit](https://mettabit.io). To support development:
+
+1. Visit [MettaBit PayPal](https://www.paypal.com/paypalme/mettabit)
+2. Select "Friends and Family" when sending your contribution
+3. Your support helps:
+   - Maintain hosting infrastructure
+   - Develop new features
+   - Provide regular updates
+   - Ensure ongoing maintenance
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:
+
+- You can freely use, modify, and distribute this software
+- Modified versions must:
+  - Use the same license
+  - Make source code available
+  - Preserve copyright notices
+- Server deployments must provide access to source code
+
+## Contributing
+
+We welcome contributions! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
 ## Acknowledgments
 
@@ -155,24 +141,16 @@ Mind Mint respects your privacy:
 - UI components styled with Tailwind CSS
 - TTS capabilities powered by various providers
 
-## Support
-
-For support, please:
-1. Check the [Issues](https://github.com/betmig/mind-mint/issues) page
-2. Create a new issue if needed
-3. Join our community discussions
-
 ## Recent Updates
 
-- Added Eleven Labs TTS integration with voice preview
-- Improved text chunking for more natural reading
-- Enhanced synchronized text highlighting
+- Added Eleven Labs TTS integration
+- Improved text chunking for natural reading
+- Enhanced synchronized highlighting
 - Added auto-scrolling during reading
-- Improved accessibility settings responsiveness
+- Improved accessibility settings
 - Added support for multiple bell sounds
 - Implemented in-memory sutta database
-- Improved navigation with logo as home link
 
 ---
 
-Made with ❤️ for the Dharma community by [@betmig](https://github.com/betmig)
+Made with ❤️ by [MettaBit](https://mettabit.io)

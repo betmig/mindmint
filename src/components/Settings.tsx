@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Settings as SettingsIcon, Volume2, Sun, Moon, RotateCcw, Mic, Play } from 'lucide-react';
+import { Settings as SettingsIcon, Volume2, Sun, Moon, RotateCcw, Mic, Play, ChevronDown, ChevronUp } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 const AccessibilityControl: React.FC<{
@@ -84,6 +84,8 @@ export const Settings: React.FC = () => {
     availableVoices,
     fetchElevenLabsVoices 
   } = useStore();
+
+  const [showAdvancedTTS, setShowAdvancedTTS] = React.useState(false);
 
   const englishVoices = availableVoices.filter(voice => 
     voice.lang.startsWith('en-')
@@ -184,156 +186,176 @@ export const Settings: React.FC = () => {
         </div>
 
         <div className="space-y-6">
-          {/* TTS Provider Selection */}
+          {/* Browser TTS Settings */}
           <div className="space-y-4">
-            {ttsProviders.map((provider) => (
-              <div
-                key={provider.name}
-                className={`p-4 rounded-lg border-2 transition-colors ${
-                  settings.ttsProvider?.name === provider.name
-                    ? 'border-primary bg-primary bg-opacity-5'
-                    : 'border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="radio"
-                    name="ttsProvider"
-                    checked={settings.ttsProvider?.name === provider.name}
-                    onChange={() => updateTTSProvider({ name: provider.name, enabled: true })}
-                    className="mt-1 text-primary focus:ring-primary"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {provider.label}
-                      </span>
-                      {provider.requiresAuth && (
-                        <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded">
-                          Requires API Key
-                        </span>
-                      )}
+            <div className="p-4 rounded-lg border-2 border-primary bg-primary bg-opacity-5">
+              <label className="flex items-start space-x-3">
+                <input
+                  type="radio"
+                  name="ttsProvider"
+                  checked={settings.ttsProvider?.name === 'browser'}
+                  onChange={() => updateTTSProvider({ name: 'browser', enabled: true })}
+                  className="mt-1 text-primary focus:ring-primary"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                      Browser Text-to-Speech
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Use your browser's built-in text-to-speech capabilities
+                  </p>
+
+                  {settings.ttsProvider?.name === 'browser' && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Voice
+                      </label>
+                      <select
+                        value={settings.selectedVoice}
+                        onChange={(e) => updateSettings({ selectedVoice: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
+                      >
+                        <option value="">Default Voice</option>
+                        {englishVoices.map((voice) => (
+                          <option key={voice.voiceURI} value={voice.name}>
+                            {voice.name} ({voice.lang})
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {provider.description}
-                    </p>
-                    
-                    {settings.ttsProvider?.name === provider.name && (
-                      <div className="mt-3 space-y-3">
-                        {provider.name === 'browser' && (
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Voice
-                            </label>
-                            <select
-                              value={settings.selectedVoice}
-                              onChange={(e) => updateSettings({ selectedVoice: e.target.value })}
-                              className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
-                            >
-                              <option value="">Default Voice</option>
-                              {englishVoices.map((voice) => (
-                                <option key={voice.voiceURI} value={voice.name}>
-                                  {voice.name} ({voice.lang})
-                                </option>
-                              ))}
-                            </select>
+                  )}
+                </div>
+              </label>
+            </div>
+
+            {/* Advanced TTS Providers Accordion */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setShowAdvancedTTS(!showAdvancedTTS)}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  Advanced TTS Providers
+                </span>
+                {showAdvancedTTS ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
+
+              {showAdvancedTTS && (
+                <div className="p-4 space-y-4">
+                  {ttsProviders.slice(1).map((provider) => (
+                    <div
+                      key={provider.name}
+                      className={`p-4 rounded-lg border-2 transition-colors ${
+                        settings.ttsProvider?.name === provider.name
+                          ? 'border-primary bg-primary bg-opacity-5'
+                          : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <label className="flex items-start space-x-3">
+                        <input
+                          type="radio"
+                          name="ttsProvider"
+                          checked={settings.ttsProvider?.name === provider.name}
+                          onChange={() => updateTTSProvider({ name: provider.name, enabled: true })}
+                          className="mt-1 text-primary focus:ring-primary"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {provider.label}
+                            </span>
+                            <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded">
+                              Requires API Key
+                            </span>
                           </div>
-                        )}
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {provider.description}
+                          </p>
 
-                        {provider.name === 'elevenlabs' && (
-                          <>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                API Key
-                              </label>
-                              <input
-                                type="password"
-                                value={settings.ttsProvider?.apiKey || ''}
-                                onChange={(e) => updateTTSProvider({ apiKey: e.target.value })}
-                                className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
-                                placeholder="Enter your Eleven Labs API key"
-                              />
-                            </div>
-
-                            {settings.ttsProvider?.apiKey && settings.elevenLabsVoices && settings.elevenLabsVoices.length > 0 && (
+                          {settings.ttsProvider?.name === provider.name && (
+                            <div className="mt-3 space-y-3">
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                  Voice
-                                </label>
-                                <div className="space-y-2">
-                                  {settings.elevenLabsVoices.map((voice) => (
-                                    <div 
-                                      key={voice.voice_id}
-                                      className={`flex items-center justify-between p-3 rounded-lg border ${
-                                        settings.ttsProvider?.selectedVoiceId === voice.voice_id
-                                          ? 'border-primary bg-primary/5'
-                                          : 'border-gray-200 dark:border-gray-700'
-                                      }`}
-                                    >
-                                      <label className="flex items-center space-x-3">
-                                        <input
-                                          type="radio"
-                                          name="elevenLabsVoice"
-                                          checked={settings.ttsProvider?.selectedVoiceId === voice.voice_id}
-                                          onChange={() => updateTTSProvider({ selectedVoiceId: voice.voice_id })}
-                                          className="text-primary focus:ring-primary"
-                                        />
-                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                          {voice.name}
-                                        </span>
-                                      </label>
-                                      <button
-                                        onClick={() => handlePreviewVoice(voice.preview_url)}
-                                        className="flex items-center space-x-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                                      >
-                                        <Play size={12} />
-                                        <span>Preview</span>
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        )}
-                        
-                        {provider.requiresAuth && provider.name !== 'elevenlabs' && (
-                          <>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                API Key
-                              </label>
-                              <input
-                                type="password"
-                                value={settings.ttsProvider?.apiKey || ''}
-                                onChange={(e) => updateTTSProvider({ apiKey: e.target.value })}
-                                className="w-full px-3 py-2 border rounded-md text-sm"
-                                placeholder="Enter API key"
-                              />
-                            </div>
-                            
-                            {provider.fields.includes('region') && (
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                  Region
+                                  API Key
                                 </label>
                                 <input
-                                  type="text"
-                                  value={settings.ttsProvider?.region || ''}
-                                  onChange={(e) => updateTTSProvider({ region: e.target.value })}
-                                  className="w-full px-3 py-2 border rounded-md text-sm"
-                                  placeholder="e.g., us-east-1"
+                                  type="password"
+                                  value={settings.ttsProvider?.apiKey || ''}
+                                  onChange={(e) => updateTTSProvider({ apiKey: e.target.value })}
+                                  className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
+                                  placeholder={`Enter your ${provider.label} API key`}
                                 />
                               </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </label>
-              </div>
-            ))}
+
+                              {provider.fields.includes('region') && (
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Region
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={settings.ttsProvider?.region || ''}
+                                    onChange={(e) => updateTTSProvider({ region: e.target.value })}
+                                    className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600"
+                                    placeholder="e.g., us-east-1"
+                                  />
+                                </div>
+                              )}
+
+                              {provider.name === 'elevenlabs' && settings.ttsProvider?.apiKey && settings.elevenLabsVoices && settings.elevenLabsVoices.length > 0 && (
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Voice
+                                  </label>
+                                  <div className="space-y-2">
+                                    {settings.elevenLabsVoices.map((voice) => (
+                                      <div 
+                                        key={voice.voice_id}
+                                        className={`flex items-center justify-between p-3 rounded-lg border ${
+                                          settings.ttsProvider?.selectedVoiceId === voice.voice_id
+                                            ? 'border-primary bg-primary/5'
+                                            : 'border-gray-200 dark:border-gray-700'
+                                        }`}
+                                      >
+                                        <label className="flex items-center space-x-3">
+                                          <input
+                                            type="radio"
+                                            name="elevenLabsVoice"
+                                            checked={settings.ttsProvider?.selectedVoiceId === voice.voice_id}
+                                            onChange={() => updateTTSProvider({ selectedVoiceId: voice.voice_id })}
+                                            className="text-primary focus:ring-primary"
+                                          />
+                                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {voice.name}
+                                          </span>
+                                        </label>
+                                        <button
+                                          onClick={() => handlePreviewVoice(voice.preview_url)}
+                                          className="flex items-center space-x-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                        >
+                                          <Play size={12} />
+                                          <span>Preview</span>
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Volume Control */}

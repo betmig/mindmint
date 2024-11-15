@@ -25,7 +25,7 @@ export interface Settings {
   readSuttaBeforeMeditation: boolean;
   autoStartTimerAfterSutta: boolean;
   ttsProvider: TTSProvider;
-  bellSound: string;
+  bellSound: BellSound;
   playBellAtStart: boolean;
   playBellAtEnd: boolean;
   elevenLabsVoices: ElevenLabsVoice[];
@@ -37,5 +37,6 @@ export interface Timer {
   seconds: number;
   remainingSeconds: number;
   isRunning: boolean;
-  bellSound?: string;
 }
+
+export type BellSound = 'tibetan-bowl' | 'zen-bell' | 'meditation-bell' | 'temple-bell';

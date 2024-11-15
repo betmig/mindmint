@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, RefreshCcw, Loader2, BookOpen } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { TimerWidget } from './TimerWidget';
-import { initDatabase, getRandomSutta, type Sutta } from '../db';
+import { initDatabase, getRandomSutta, getSutta, type Sutta } from '../db';
 
 // Split text into semantic chunks while preserving natural reading flow
 const formatText = (text: string): string[] => {
@@ -54,7 +54,7 @@ const formatText = (text: string): string[] => {
 };
 
 export const SuttaReader: React.FC = () => {
-  const { settings, speech, isReading, setIsReading, speak } = useStore();
+  const { settings, speech, isReading, setIsReading, speak, currentSuttaId, setCurrentSuttaId } = useStore();
   const [currentSutta, setCurrentSutta] = useState<Sutta | null>(null);
   const [phrases, setPhrases] = useState<string[]>([]);
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(-1);
@@ -63,19 +63,38 @@ export const SuttaReader: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const readingRef = useRef(false);
+  const dbInitialized = useRef(false);
+  const initializationAttempted = useRef(false);
 
   useEffect(() => {
     const init = async () => {
+      if (initializationAttempted.current) return;
+      initializationAttempted.current = true;
+
       try {
         await initDatabase();
-        await fetchRandomSutta();
+        dbInitialized.current = true;
+        
+        // Load existing sutta or fetch a new one
+        if (currentSuttaId) {
+          const sutta = getSutta(currentSuttaId);
+          if (sutta) {
+            setCurrentSutta(sutta);
+            setPhrases(formatText(sutta.content));
+          } else {
+            await fetchRandomSutta();
+          }
+        } else {
+          await fetchRandomSutta();
+        }
       } catch (error) {
         console.error('Failed to initialize:', error);
         setError('Failed to load sutta. Please try again.');
       }
     };
+
     init();
-  }, []);
+  }, [currentSuttaId]);
 
   useEffect(() => {
     if (currentSutta) {
@@ -96,6 +115,11 @@ export const SuttaReader: React.FC = () => {
   };
 
   const readText = async () => {
+    if (!speech) {
+      setError('Text-to-speech is not available');
+      return;
+    }
+
     try {
       setIsReading(true);
       readingRef.current = true;
@@ -103,16 +127,14 @@ export const SuttaReader: React.FC = () => {
       setReadingComplete(false);
       setError(null);
 
-      for (let i = 0; i < phrases.length; i++) {
-        if (!readingRef.current) break;
-
+      for (let i = 0; i < phrases.length && readingRef.current; i++) {
         setCurrentPhraseIndex(i);
         scrollToPhrase(i);
 
         try {
           await speak(phrases[i]);
           
-          // Natural pause between phrases based on punctuation
+          // Only add pause if we're still reading
           if (readingRef.current) {
             const pauseDuration = phrases[i].match(/[.!?]$/) ? 800 : 
                                 phrases[i].match(/[,;:]$/) ? 400 : 
@@ -121,7 +143,11 @@ export const SuttaReader: React.FC = () => {
           }
         } catch (error) {
           console.error('Error speaking phrase:', error);
-          if (!readingRef.current) break; // Stop if reading was cancelled
+          // Only set error if it's not due to interruption
+          if (readingRef.current && (!error || error?.error !== 'interrupted')) {
+            setError('Failed to read text. Please try again.');
+            break;
+          }
         }
       }
 
@@ -130,7 +156,9 @@ export const SuttaReader: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to read text:', error);
-      setError('Failed to read text. Please try again.');
+      if (readingRef.current) {
+        setError('Failed to read text. Please try again.');
+      }
     } finally {
       readingRef.current = false;
       setIsReading(false);
@@ -139,22 +167,26 @@ export const SuttaReader: React.FC = () => {
   };
 
   const stopReading = () => {
+    readingRef.current = false;
     if (speech) {
-      readingRef.current = false;
       speech.cancel();
-      setIsReading(false);
-      setCurrentPhraseIndex(-1);
     }
+    setIsReading(false);
+    setCurrentPhraseIndex(-1);
   };
 
   const fetchRandomSutta = async () => {
     setLoading(true);
     setError(null);
+    stopReading();
+    setReadingComplete(false);
+
     try {
       const sutta = getRandomSutta();
       if (sutta) {
         setCurrentSutta(sutta);
-        setReadingComplete(false);
+        setCurrentSuttaId(sutta.id);
+        setPhrases(formatText(sutta.content));
       } else {
         throw new Error('No sutta found');
       }

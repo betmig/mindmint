@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Timer as TimerIcon, Settings2, Info, Sprout } from 'lucide-react';
+import { Timer as TimerIcon, Settings2, Info, Sprout, Heart } from 'lucide-react';
 import { SuttaReader } from './components/SuttaReader';
 import { Timer } from './components/Timer';
 import { Settings } from './components/Settings';
 import { About } from './components/About';
+import { Support } from './components/Support';
 import { useStore } from './store/useStore';
 
 function App() {
@@ -53,6 +54,14 @@ function App() {
                       <span>Settings</span>
                     </Link>
                     <Link
+                      to="/support"
+                      className="flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
+                      aria-label="Support Us"
+                    >
+                      <Heart size={20} aria-hidden="true" />
+                      <span>Support</span>
+                    </Link>
+                    <Link
                       to="/about"
                       className="flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
                       aria-label="About"
@@ -71,6 +80,7 @@ function App() {
               <Route path="/" element={<SuttaReader />} />
               <Route path="/timer" element={<Timer />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/support" element={<Support />} />
               <Route path="/about" element={<About />} />
             </Routes>
           </main>

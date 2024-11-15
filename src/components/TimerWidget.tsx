@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Play, Pause, RefreshCw } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { audioService } from '../services/AudioService';
 
 interface TimerWidgetProps {
   readingComplete: boolean;
@@ -8,12 +9,26 @@ interface TimerWidgetProps {
 
 export const TimerWidget: React.FC<TimerWidgetProps> = ({ readingComplete }) => {
   const { settings, timer, isReading, updateTimer, tickTimer, resetTimer } = useStore();
+  const hasStartBellPlayed = useRef(false);
+  const previousTimeRef = useRef<number | null>(null);
+  const autoStartTriggered = useRef(false);
 
   useEffect(() => {
     let interval: number;
     
     if (timer.isRunning) {
+      // Play start bell when timer starts
+      if (settings.playBellAtStart && !hasStartBellPlayed.current) {
+        audioService.play(settings.bellSound).catch(error => {
+          console.error('Failed to play start bell:', error);
+        });
+        hasStartBellPlayed.current = true;
+      }
+      
       interval = window.setInterval(tickTimer, 1000);
+    } else {
+      // Reset the start bell flag when timer is stopped or paused
+      hasStartBellPlayed.current = false;
     }
 
     return () => {
@@ -21,13 +36,66 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({ readingComplete }) => 
         clearInterval(interval);
       }
     };
-  }, [timer.isRunning, tickTimer]);
+  }, [timer.isRunning, tickTimer, settings.playBellAtStart, settings.bellSound]);
 
+  // Handle end bell
   useEffect(() => {
-    if (settings.autoStartTimerAfterSutta && readingComplete && !isReading) {
-      updateTimer({ isRunning: true });
+    // Initialize previousTimeRef on first render
+    if (previousTimeRef.current === null) {
+      previousTimeRef.current = timer.remainingSeconds;
+      return;
+    }
+
+    // Play end bell when timer reaches zero from a non-zero state
+    if (previousTimeRef.current > 0 && timer.remainingSeconds === 0 && settings.playBellAtEnd) {
+      audioService.play(settings.bellSound).catch(error => {
+        console.error('Failed to play end bell:', error);
+      });
+    }
+    previousTimeRef.current = timer.remainingSeconds;
+  }, [timer.remainingSeconds, settings.playBellAtEnd, settings.bellSound]);
+
+  // Handle auto-start after sutta reading
+  useEffect(() => {
+    if (settings.autoStartTimerAfterSutta && readingComplete && !isReading && !autoStartTriggered.current) {
+      // Add a delay before starting the timer
+      const startTimer = async () => {
+        autoStartTriggered.current = true;
+        hasStartBellPlayed.current = false;
+        
+        // Wait a moment for any TTS to fully complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Start the timer
+        updateTimer({ isRunning: true });
+      };
+      
+      startTimer();
     }
   }, [readingComplete, isReading, settings.autoStartTimerAfterSutta, updateTimer]);
+
+  // Reset auto-start trigger when reading starts again
+  useEffect(() => {
+    if (isReading) {
+      autoStartTriggered.current = false;
+    }
+  }, [isReading]);
+
+  const handleStartPause = () => {
+    if (!timer.isRunning) {
+      // Reset the bell flag when manually starting the timer
+      hasStartBellPlayed.current = false;
+    }
+    updateTimer({ isRunning: !timer.isRunning });
+  };
+
+  const handleReset = () => {
+    resetTimer();
+    hasStartBellPlayed.current = false;
+    previousTimeRef.current = 0;
+    autoStartTriggered.current = false;
+    audioService.stop(settings.bellSound);
+  };
 
   const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
@@ -52,7 +120,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({ readingComplete }) => 
       </div>
       <div className="flex items-center space-x-2">
         <button
-          onClick={() => updateTimer({ isRunning: !timer.isRunning })}
+          onClick={handleStartPause}
           className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!canStartTimer}
           aria-label={timer.isRunning ? 'Pause meditation timer' : 'Start meditation timer'}
@@ -61,7 +129,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({ readingComplete }) => 
           <span>{timer.isRunning ? 'Pause' : 'Start'}</span>
         </button>
         <button
-          onClick={resetTimer}
+          onClick={handleReset}
           className="flex items-center justify-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           aria-label="Reset timer"
         >
